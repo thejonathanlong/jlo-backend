@@ -71,24 +71,28 @@ class JloData(object):
 
 		return command + ')'
 	
+
 	@staticmethod
-	def insert_statement(table_name, properties, values):
+	def insert_statement(table_name, properties):
+		'''
+		table_name - string - the name of the table in which to INSERT
+		properties - [string] - a list of the properties
+		'''
 		insert = 'INSERT into ' + table_name + '('
 		property_index = 0
+		values_string = 'values('
 		for the_property in properties:
 			insert = insert + the_property
+			values_string = values_string + '?'
 			if property_index != len(properties) - 1:
 				insert = insert + ','
+				values_string = values_string + ','
+			else:
+				insert = insert + ')'
+				values_string = values_string + ')'
 			property_index = property_index + 1
 		
-		property_index = 0
-		insert = insert + ') values('
-		for value in values:
-			insert = insert + '?'
-			if property_index != len(values) - 1:
-				insert = insert + ','
-			property_index = property_index + 1
-		insert = insert + ')'
+		insert = insert + ' ' + values_string
 		print "Insert - " + str(insert)
 		return insert
 
@@ -99,11 +103,24 @@ class JloData(object):
 				return table[1]
 		return []
 
-	def commit(self, statement, values):
+	def commit(self, statement, properties, values):
+		new_values = order_values_for_properties(values, properties)
 		db = sqlite3.connect(self.DB_NAME())
 		cursor = db.cursor()
-		committed = cursor.execute(statement, values)
+		committed = cursor.execute(statement, new_values)
 		printer.pretty_print("Prepared for Commit: " + str(statement))
 		db.commit()
 		printer.pretty_print("Saving to the database.")
 		db.close()
+
+'''END JloData '''
+
+def order_values_for_properties(values, properties):
+		''' 
+		values - {string:id} - A dictionary of string id pairs where the string corresponds to a property
+		properties - [string] - An array of strings. One for each column in the table
+		'''
+		new_values = []
+		for the_property in properties:
+			new_values.append(values[the_property])
+		return new_values
