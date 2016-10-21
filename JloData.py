@@ -1,5 +1,6 @@
 import json
 import sqlite3, os
+from JELPrettyPrint import JELPrettyPrint as printer
 
 TABLES_KEY = "tables"
 PROPERTIES_KEY = "properties"
@@ -11,7 +12,17 @@ def print_debug(s):
 	if (DEBUG_MODE): print create_table_command
 
 class JloData(object):
-	tables = [] # array of tupes such that tuple[0] is table_name and tuple[1] is an array of properties
+	#############
+	# Properties #
+	#############
+	schema = [] # array of tupes such that tuple[0] is table_name and tuple[1] is an array of properties
+
+	def DB_NAME():
+		return "DEFAULT_NAME"
+
+	##############
+	# Constructor #
+	##############
 	def __init__(self, json_file=''):
 		assert(json_file != '')
 		data = None
@@ -20,11 +31,14 @@ class JloData(object):
 		self.create_data_from_json(json_data)
 
 
+	##############
+	# JSON Parsing #
+	##############
 	def create_data_from_json(self, json_data):
 		tables = json_data[TABLES_KEY]
 
 		#Connect to the DB and get the cursor
-		db = sqlite3.connect(self.DB_NAME)
+		db = sqlite3.connect(self.DB_NAME())
 		cursor = db.cursor()
 
 		for table in tables:
@@ -35,10 +49,12 @@ class JloData(object):
 			create_table_command = JloData.create_table_command(table_name, properties, table[FOREIGN_KEY_INFO_KEY])
 			print_debug(str(create_table_command))
 			cursor.execute(create_table_command)
-			
+			self.schema.append((table_name, property_names))
+		db.commit()
 
-
-
+	#################
+	# SQL Statements #
+	#################
 	@staticmethod
 	def create_table_command(table_name, property_qualifier_pairs, foreign_key_info, shouldHavePrimaryKeyID=True):
 		command = 'CREATE TABLE IF NOT EXISTS ' + table_name + '('
@@ -69,10 +85,25 @@ class JloData(object):
 		insert = insert + ') values('
 		for value in values:
 			insert = insert + '?'
-		# 	insert = insert + '\'' + str(value) + '\''
 			if property_index != len(values) - 1:
 				insert = insert + ','
 			property_index = property_index + 1
 		insert = insert + ')'
 		print "Insert - " + str(insert)
 		return insert
+
+
+	def table_properties(self, table_name):
+		for table in self.schema:
+			if table[0] == table_name:
+				return table[1]
+		return []
+
+	def commit(self, statement, values):
+		db = sqlite3.connect(self.DB_NAME())
+		cursor = db.cursor()
+		committed = cursor.execute(statement, values)
+		printer.pretty_print("Prepared for Commit: " + str(statement))
+		db.commit()
+		printer.pretty_print("Saving to the database.")
+		db.close()

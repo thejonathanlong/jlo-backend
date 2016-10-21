@@ -1,14 +1,19 @@
 {
 	"tables" : [
 		{
+			"table_name" : "Comment",
+			"properties" : { "user_name" : "TEXT NOT NULL", "post_id" : "INTEGER NOT NULL", "body" : "TEXT NOT NULL", "post_time" : "TEXT NOT NULL"},
+			"keys" : ["FOREIGN KEY(post_id) REFERENCES Post(ID)"]
+		},
+		{
 			"table_name" : "Image",
-			"properties" : { "imageDestination" : "TEXT NOT NULL", "post_id" : "INTEGER NOT NULL"},
+			"properties" : { "image_destination" : "TEXT NOT NULL", "post_id" : "INTEGER NOT NULL"},
 			"keys" : ["FOREIGN KEY(post_id) REFERENCES Post(ID)"]
 		},
 		{
 			"table_name" : "Post",
-			"properties" : { "title" : "TEXT NOT NULL", "body" : "TEXT NOT NULL"},
-			"keys" : []
+			"properties" : { "title" : "TEXT NOT NULL", "body" : "TEXT NOT NULL", "zone_id" : "INTEGER NOT NULL"},
+			"keys" : ["FOREIGN KEY(zone_id) REFERENCES Zost(ID)"]
 		},
 		{
 			"table_name" : "Zone",
