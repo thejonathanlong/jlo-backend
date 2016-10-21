@@ -1,0 +1,14 @@
+{
+	"tables" : [
+		{
+			"table_name" : "table_1",
+			"properties" : { "property_name" : "qualifier", "another_property_Name" : "another_qualifier"},
+			"keys" : ["foreign_key_info_1", "foreign_key_info_2"]
+		},
+		{
+			"table_name" : "table_2",
+			"properties" : { "property_name" : "qualifier"},
+			"keys" : []
+		}
+	]
+}
