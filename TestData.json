@@ -1,13 +1,18 @@
 {
 	"tables" : [
 		{
-			"table_name" : "table_1",
-			"properties" : { "property_name" : "qualifier", "another_property_Name" : "another_qualifier"},
-			"keys" : ["foreign_key_info_1", "foreign_key_info_2"]
+			"table_name" : "Image",
+			"properties" : { "imageDestination" : "TEXT NOT NULL", "post_id" : "INTEGER NOT NULL"},
+			"keys" : ["FOREIGN KEY(post_id) REFERENCES Post(ID)"]
 		},
 		{
-			"table_name" : "table_2",
-			"properties" : { "property_name" : "qualifier"},
+			"table_name" : "Post",
+			"properties" : { "title" : "TEXT NOT NULL", "body" : "TEXT NOT NULL"},
+			"keys" : []
+		},
+		{
+			"table_name" : "Zone",
+			"properties" : { "zone_name" : "TEXT NOT NULL UNIQUE"},
 			"keys" : []
 		}
 	]
