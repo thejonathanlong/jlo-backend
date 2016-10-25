@@ -54,10 +54,12 @@ class JLData(JloData):
 	# Get Data #
 	############
 	def get_all_zones(self):
-		select = 'SELECT * from ' + str(self.ZONE_TABLE)
-		zones = self.__execute(select).fetchall()
-		zones_dict = self.albums_with_columns(zones)
-		return zones_dict
+		rows = self.get_rows(self.ZONE_TABLE)
+		columns = self.get_column_names(self.ZONE_TABLE)
+		results = []
+		for row in rows:
+			results.append(dict(zip(columns, row)))
+		return results
 
 	def get_id_for_zone(self, zone_name):
 		select = 'SELECT * from ' + str(self.ZONE_TABLE) + ' where zone_name=\'' + str(zone_name) + '\''

@@ -108,19 +108,26 @@ class JloData(object):
 		cursor = self.__execute(select)
 		return [description[0] for description in cursor.description]
 
-	def get_rows(self, table_name, condition):
-		if condition != None or condition != "" or condition != " "
+	def get_rows(self, table_name, condition=None):
+		if condition != None and condition != "" and condition != " ":
 			select = 'SELECT * from ' + table_name +' where ' + condition
 		else:
 			select = 'SELECT * from ' + table_name
 		results = self.__execute(select).fetchall()
+		return results
+
+	def select_all(self, table_name):
+		rows = self.get_rows(table_name)
 		columns = self.get_column_names(table_name)
-		return zip(columns, results)
+		results = []
+		for row in rows:
+			results.append(dict(zip(columns, row)))
+		return results
 
 	#################
 	# DB Operations #
 	#################
-	def __commit(self, statement, properties, values):
+	def commit(self, statement, properties, values):
 		new_values = order_values_for_properties(values, properties)
 		db = sqlite3.connect(self.DB_NAME())
 		cursor = db.cursor()
