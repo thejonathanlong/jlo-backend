@@ -103,7 +103,24 @@ class JloData(object):
 				return table[1]
 		return []
 
-	def commit(self, statement, properties, values):
+	def get_column_names(self, table_name):
+		select = 'SELECT * from ' + str(table_name)
+		cursor = self.__execute(select)
+		return [description[0] for description in cursor.description]
+
+	def get_rows(self, table_name, condition):
+		if condition != None or condition != "" or condition != " "
+			select = 'SELECT * from ' + table_name +' where ' + condition
+		else:
+			select = 'SELECT * from ' + table_name
+		results = self.__execute(select).fetchall()
+		columns = self.get_column_names(table_name)
+		return zip(columns, results)
+
+	#################
+	# DB Operations #
+	#################
+	def __commit(self, statement, properties, values):
 		new_values = order_values_for_properties(values, properties)
 		db = sqlite3.connect(self.DB_NAME())
 		cursor = db.cursor()
@@ -112,6 +129,21 @@ class JloData(object):
 		db.commit()
 		printer.pretty_print("Saving to the database.")
 		db.close()
+
+	def __execute(self, statement):
+		db = sqlite3.connect(self.DB_NAME())
+		cursor = db.cursor()
+		executed = cursor.execute(statement)
+		printer.pretty_print("Executed: " + str(statement))
+		return executed
+
+	def __update(self, statement):
+		db = sqlite3.connect(self.DB_NAME)
+		cursor = db.cursor()
+		committed = cursor.execute(statement)
+		printer.pretty_print("Prepared for Commit: " + str(statement))
+		db.commit()
+		printer.pretty_print("Saving to the database.")
 
 '''END JloData '''
 
