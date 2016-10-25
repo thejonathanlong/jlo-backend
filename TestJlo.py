@@ -2,12 +2,15 @@ from JLData import JLData
 from JloData import JloData
 
 def main():
+	# columns = ["column_1", "column_2", "column_3"]
+	# results = [("a", "b", "c"), ("d", "e", "f"), ("g", "h", "i")]
 	j = JLData("TestData.json")
-	# v = {"title": "Hello World", "body" : "World ", "zone_id" : 1}
-	# i = j.insert_post_statement()
-	# j.commit(i, j.table_properties(j.POST_TABLE), v)
-	x = j.get_all_posts()
-	print x
+	zone = {"zone_name" : "My Other Zone"}
+	post = {"title": "Hello World", "body" : "World ", "zone_id" : 1}
+	# j.insert_zone(zone)
+	# j.insert_post(post)
+	
+	print j.get_post("Hello Worl")
 
 if __name__ == '__main__':
 	main()

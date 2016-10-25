@@ -31,9 +31,25 @@ class JLData(JloData):
 	COMMENT_TABLE = "Comment"
 	MEDIA_TABLE = "Media"
 	POST_TABLE = "Post"
+	UNIQUE_ID_PROPERTY = "ID"
 	
 	def DB_NAME(self):
 		return "JLBLogData.db"
+
+	#####################
+	# Insert Operations #
+	#####################
+	def insert_zone(self, values):
+		self.commit(self.insert_zone_statement(), self.table_properties(self.ZONE_TABLE), values)
+
+	def insert_post(self, values):
+		self.commit(self.insert_post_statement(), self.table_properties(self.POST_TABLE), values)
+
+	def insert_comment(self, values):
+		self.commit(self.insert_comment_statement(), self.table_properties(self.COMMENT_TABLE), values)
+
+	def insert_image(self, values):
+		self.commit(self.insert_image_statement(), self.table_properties(self.MEDIA_TABLE), values)
 
 	#####################
 	# Insert Statements #
@@ -53,34 +69,56 @@ class JLData(JloData):
 	############
 	# Get Data #
 	############
+	#Zones
 	def get_all_zones(self):
-		rows = self.get_rows(self.ZONE_TABLE)
-		columns = self.get_column_names(self.ZONE_TABLE)
-		results = []
-		for row in rows:
-			results.append(dict(zip(columns, row)))
-		return results
+		return self.select_all(self.ZONE_TABLE)
 
 	def get_id_for_zone(self, zone_name):
-		select = 'SELECT * from ' + str(self.ZONE_TABLE) + ' where zone_name=\'' + str(zone_name) + '\''
-		album = self.__execute(select)
-		return album.fetchone()[0]
+		condition = 'zone_name=\'' + str(zone_name) + '\''
+		return self.select_all(self.ZONE_TABLE, condition)
+
+	#Posts
+	def get_all_posts(self):
+		return self.select_all(self.POST_TABLE)
 
 	def get_all_posts_in_zone(self, zone_name):
+		zone_id = self.get_id_for_zone(zone_name)[0][self.UNIQUE_ID_PROPERTY]
 		condition = 'zone_id=\'' + str(zone_id) + '\''
-		return self.get_rows(self.POST_TABLE, condition)
+		return self.select_all(self.POST_TABLE, condition)
 
+	def get_id_for_post(self, title):
+		return self.get_post(title)[0][self.UNIQUE_ID_PROPERTY]
+
+	def get_post(self, title=None, post_id=0):
+		if post_id <= 0:
+			assert(title != None)
+			condition = 'title=\'' + str(title) + '\''
+			return self.select_all(self.POST_TABLE, condition)
+		condition = self.UNIQUE_ID_PROPERTY + '=\'' + str(post_id) + '\''
+		return self.select_all(self.POST_TABLE)
+
+	#Media
 	def get_all_media(self):
-		select = 'SELECT * from ' + str(self.media_TABLE)
-		media = self.__execute(select).fetchall()
-		media_dict = self.albums_with_columns(media)
-		return media_dict
+		return self.select_all(self.MEDIA_TABLE)
 
+	def get_media_for_post(self, title=None, post_id=0):
+		if post_id <= 0:
+			assert(title != None)
+			post_id = self.get_id_for_post(title)
+		condition = 'post_id=\'' + str(post_id) + '\''
+		return self.select_all(self.MEDIA_TABLE, condition)
+
+	#Comments
 	def get_all_comments(self):
-		select = 'SELECT * from ' + str(self.COMMENT_TABLE)
-		comments = self.__execute(select).fetchall()
-		comments_dict = self.albums_with_columns(comments)
-		return comments_dict
+		return self.select_all(self.COMMENT_TABLE)
+
+	def get_comments_for_post(self, title=None, post_id=0):
+		if post_id <= 0:
+			assert(title != None)
+			post_id = self.get_id_for_post(title)
+		condition = 'post_id=\'' + str(post_id) + '\''
+		return self.select_all(self.COMMENT_TABLE, condition)
+
 
 	##################
 	# Column Helpers #

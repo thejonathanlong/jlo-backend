@@ -116,13 +116,10 @@ class JloData(object):
 		results = self.__execute(select).fetchall()
 		return results
 
-	def select_all(self, table_name):
-		rows = self.get_rows(table_name)
+	def select_all(self, table_name, condition=None):
+		rows = self.get_rows(table_name, condition)
 		columns = self.get_column_names(table_name)
-		results = []
-		for row in rows:
-			results.append(dict(zip(columns, row)))
-		return results
+		return map(lambda row : dict(zip(columns, row)), rows)
 
 	#################
 	# DB Operations #
