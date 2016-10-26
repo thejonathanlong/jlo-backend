@@ -1,0 +1,12 @@
+1. Create some mechanism for coalescing commits
+	a. Don't commit to the database on every insert/update
+	b. Group inserts together and commit less frequentyl
+	c. Commit before the data is lost
+
+2. Probably need a way to delete some stuff
+	a. Comments
+	b. Posts
+	c. Zones
+	d. Media
+	e. What if we didn't actually do a delete, but marked things as hidden?
+	f. Then I guess we could have a hard "No actually delete this ish" button.

@@ -18,12 +18,21 @@ class FoundationData(object):
 	schema = [] # array of tupes such that tuple[0] is table_name and tuple[1] is an array of properties
 
 	def DB_NAME():
+		''' 
+		Returns:
+			The name of the database.
+		'''
 		return "DEFAULT_NAME"
 
 	##############
 	# Constructor #
 	##############
 	def __init__(self, json_file=''):
+		'''
+		Creates a new instance of FoundationData from a json file. 
+		Arguments:
+			json_file (str) : path to the JSON file
+		'''
 		assert(json_file != '')
 		data = None
 		with open(os.path.expanduser(json_file)) as data_file:
@@ -35,6 +44,12 @@ class FoundationData(object):
 	# JSON Parsing #
 	##############
 	def create_data_from_json(self, json_data):
+		'''
+		Parses the JSON data and creates the database with the schema described in the JSON 
+		
+		Arguments:
+			json_data : The result of json.loads(path_to_json_file)
+		'''
 		tables = json_data[TABLES_KEY]
 
 		#Connect to the DB and get the cursor
@@ -56,9 +71,21 @@ class FoundationData(object):
 	# SQL Statements #
 	#################
 	@staticmethod
-	def create_table_command(table_name, property_qualifier_pairs, foreign_key_info, shouldHavePrimaryKeyID=True):
+	def create_table_command(table_name, property_qualifier_pairs, foreign_key_info, should_have_primary_key_id=True):
+		'''
+		Static method that retuns a statement to create a new table in the database
+		
+		Arguments:
+			table_name (str) : The name of the new table
+			property_qualifier_pairs ([Tuples]) : A list of the properties and database qualifiers (i.e. title TEXT NOT NULL)
+			foreign_key_info ([str]) : A list of strings that identify the foreign key information for this table (i.e. ["FOREIGN KEY(post_id) REFERENCES Post(ID)"])
+			should_have_primary_key_id (bool) : If the table should have an autoincrement primary ID named ID. Defaulst to true
+
+		Returns:
+			The SQL command to create the table specified.
+		'''
 		command = 'CREATE TABLE IF NOT EXISTS ' + table_name + '('
-		if shouldHavePrimaryKeyID:
+		if should_have_primary_key_id:
 			command = command + 'ID INTEGER PRIMARY KEY ASC'
 		PROPERTY_NAME_INDEX = 0
 		QUALIFIER_INDEX = 1
@@ -71,7 +98,9 @@ class FoundationData(object):
 
 		return command + ')'
 	
-
+	##########
+	# Insert #
+	##########
 	@staticmethod
 	def insert_statement(table_name, properties):
 		'''
@@ -97,6 +126,9 @@ class FoundationData(object):
 		return insert
 
 
+	##########
+	# Select #
+	##########
 	def table_properties(self, table_name):
 		for table in self.schema:
 			if table[0] == table_name:
@@ -121,6 +153,14 @@ class FoundationData(object):
 		columns = self.get_column_names(table_name)
 		return map(lambda row : dict(zip(columns, row)), rows)
 
+	##########
+	# Update #
+	##########
+	def update_table(self, table_name, property_set_statment, condition):
+		update = 'UPDATE ' + table_name + ' set ' + property_set_statment + ' where ' + condition
+		self.__update(update)
+		printer.pretty_print_positive(update)
+
 	#################
 	# DB Operations #
 	#################
@@ -142,19 +182,20 @@ class FoundationData(object):
 		return executed
 
 	def __update(self, statement):
-		db = sqlite3.connect(self.DB_NAME)
+		db = sqlite3.connect(self.DB_NAME())
 		cursor = db.cursor()
 		committed = cursor.execute(statement)
 		printer.pretty_print("Prepared for Commit: " + str(statement))
 		db.commit()
 		printer.pretty_print("Saving to the database.")
+		db.close()
 
 '''END FoundationData '''
 
 def order_values_for_properties(values, properties):
 		''' 
-		values - {string:id} - A dictionary of string id pairs where the string corresponds to a property
-		properties - [string] - An array of strings. One for each column in the table
+		@param values - {string:id} - A dictionary of string id pairs where the string corresponds to a property
+		@param properties - [string] - An array of strings. One for each column in the table
 		'''
 		new_values = []
 		for the_property in properties:

@@ -12,7 +12,7 @@
 		},
 		{
 			"table_name" : "Post",
-			"properties" : { "title" : "TEXT NOT NULL", "body" : "TEXT NOT NULL", "zone_id" : "INTEGER NOT NULL"},
+			"properties" : { "title" : "TEXT NOT NULL", "body" : "TEXT NOT NULL", "post_time" : "TEXT NOT NULL", "zone_id" : "INTEGER NOT NULL"},
 			"keys" : ["FOREIGN KEY(zone_id) REFERENCES Zone(ID)"]
 		},
 		{

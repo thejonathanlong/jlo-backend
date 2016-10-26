@@ -75,22 +75,30 @@ class LiveData(FoundationData):
 
 	def get_id_for_zone(self, zone_name):
 		condition = 'zone_name=\'' + str(zone_name) + '\''
-		return self.select_all(self.ZONE_TABLE, condition)
+		zones = self.select_all(self.ZONE_TABLE, condition)
+		if len(zones) > 0:
+			return zones[0][self.UNIQUE_ID_PROPERTY]
+		else:
+			return None
 
 	#Posts
 	def get_all_posts(self):
 		return self.select_all(self.POST_TABLE)
 
 	def get_all_posts_in_zone(self, zone_name):
-		zone_id = self.get_id_for_zone(zone_name)[0][self.UNIQUE_ID_PROPERTY]
+		zone_id = self.get_id_for_zone(zone_name)
 		condition = 'zone_id=\'' + str(zone_id) + '\''
 		return self.select_all(self.POST_TABLE, condition)
 
 	def get_id_for_post(self, title):
-		return self.get_post(title)[0][self.UNIQUE_ID_PROPERTY]
+		posts = self.get_post(title)
+		if len(posts) > 0: 
+			return posts[0][self.UNIQUE_ID_PROPERTY]
+		else:
+			return None
 
-	def get_post(self, title=None, post_id=0):
-		if post_id <= 0:
+	def get_post(self, title=None, post_id=-1):
+		if post_id < 0:
 			assert(title != None)
 			condition = 'title=\'' + str(title) + '\''
 			return self.select_all(self.POST_TABLE, condition)
@@ -101,8 +109,8 @@ class LiveData(FoundationData):
 	def get_all_media(self):
 		return self.select_all(self.MEDIA_TABLE)
 
-	def get_media_for_post(self, title=None, post_id=0):
-		if post_id <= 0:
+	def get_media_for_post(self, title=None, post_id=-1):
+		if post_id < 0:
 			assert(title != None)
 			post_id = self.get_id_for_post(title)
 		condition = 'post_id=\'' + str(post_id) + '\''
@@ -112,13 +120,52 @@ class LiveData(FoundationData):
 	def get_all_comments(self):
 		return self.select_all(self.COMMENT_TABLE)
 
-	def get_comments_for_post(self, title=None, post_id=0):
-		if post_id <= 0:
+	def get_comments_for_post(self, title=None, post_id=-1):
+		if post_id < 0:
 			assert(title != None)
 			post_id = self.get_id_for_post(title)
 		condition = 'post_id=\'' + str(post_id) + '\''
 		return self.select_all(self.COMMENT_TABLE, condition)
 
+	###############
+	# Update Data #
+	###############
+	#zone
+	def update_zone_name(self, new_zone_name, current_zone_name=None, zone_id=-1):
+		if zone_id < 0:
+			assert(current_zone_name != None)
+			zone_id = self.get_id_for_zone(current_zone_name)
+		zone_name_set_statement = "zone_name=\'" + new_zone_name + "\'"
+		condition = str(self.UNIQUE_ID_PROPERTY) + '=' + str(zone_id)
+		self.update_table(self.ZONE_TABLE, zone_name_set_statement, condition)
+
+	#post
+	def update_post_title(self, new_title, current_title=None, post_id=-1):
+		if post_id < 0:
+			assert(current_title != None)
+			post_id = self.get_id_for_post(current_title)
+		post_title_set_statement = "title=\'" + new_title + "\'"
+		condition = str(self.UNIQUE_ID_PROPERTY) + '=' + str(post_id)
+		self.update_table(self.POST_TABLE, post_title_set_statement, condition)
+
+	def update_post_body(self, new_body, post_title=None, post_id=-1):
+		if post_id < 0:
+			assert(post_title != None)
+			post_id = self.get_id_for_post(post_title)
+		post_body_set_statement = "body=\'" + new_body + "\'"
+		condition = str(self.UNIQUE_ID_PROPERTY) + '=' + str(post_id)
+		self.update_table(self.POST_TABLE, post_body_set_statement, condition)
+
+	def update_post_zone(self, new_zone_name, post_title=None, post_id=-1):
+		if post_id < 0:
+			assert(post_title != None)
+			post_id = self.get_id_for_post(post_title)
+
+		new_zone_id = self.get_id_for_zone(new_zone_name)
+		if new_zone_id != None:
+			post_zone_id_set_statement = "zone_id=\'" + new_zone_id + "\'"
+			condition = str(self.UNIQUE_ID_PROPERTY) + '=' + str(post_id)
+			self.update_table(self.POST_TABLE, post_zone_id_set_statement, condition)
 
 	##################
 	# Column Helpers #
