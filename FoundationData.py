@@ -11,7 +11,7 @@ DEBUG_MODE = False
 def print_debug(s):
 	if (DEBUG_MODE): print create_table_command
 
-class JloData(object):
+class FoundationData(object):
 	#############
 	# Properties #
 	#############
@@ -46,7 +46,7 @@ class JloData(object):
 			properties = zip(property_names, table[PROPERTIES_KEY].values())
 			table_name = table[TABLE_NAME_KEY] 
 
-			create_table_command = JloData.create_table_command(table_name, properties, table[FOREIGN_KEY_INFO_KEY])
+			create_table_command = FoundationData.create_table_command(table_name, properties, table[FOREIGN_KEY_INFO_KEY])
 			print_debug(str(create_table_command))
 			cursor.execute(create_table_command)
 			self.schema.append((table_name, property_names))
@@ -149,7 +149,7 @@ class JloData(object):
 		db.commit()
 		printer.pretty_print("Saving to the database.")
 
-'''END JloData '''
+'''END FoundationData '''
 
 def order_values_for_properties(values, properties):
 		''' 

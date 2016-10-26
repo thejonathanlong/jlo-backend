@@ -1,7 +1,7 @@
-from JloData import JloData
+from FoundationData import FoundationData
 
 '''
-JLData is a database representation for a Blog. 
+LiveData is a database representation for a Blog. 
 A Blog is defined as:
 Zone
 	id
@@ -25,7 +25,7 @@ Comment
 	body
 '''
 
-class JLData(JloData):
+class LiveData(FoundationData):
 	# Table Names
 	ZONE_TABLE = "Zone"
 	COMMENT_TABLE = "Comment"
@@ -55,16 +55,16 @@ class JLData(JloData):
 	# Insert Statements #
 	#####################
 	def insert_zone_statement(self):
-		return JLData.insert_statement(self.ZONE_TABLE, self.table_properties(self.ZONE_TABLE))
+		return LiveData.insert_statement(self.ZONE_TABLE, self.table_properties(self.ZONE_TABLE))
 
 	def insert_post_statement(self):
-		return JLData.insert_statement(self.POST_TABLE, self.table_properties(self.POST_TABLE))
+		return LiveData.insert_statement(self.POST_TABLE, self.table_properties(self.POST_TABLE))
 
 	def insert_comment_statement(self):
-		return JLData.insert_statement(self.COMMENT_TABLE, self.table_properties(self.COMMENT_TABLE))
+		return LiveData.insert_statement(self.COMMENT_TABLE, self.table_properties(self.COMMENT_TABLE))
 
 	def insert_media_statement(self):
-		return JLData.insert_statement(self.media_TABLE, self.table_properties(self.media_TABLE))
+		return LiveData.insert_statement(self.media_TABLE, self.table_properties(self.media_TABLE))
 
 	############
 	# Get Data #
