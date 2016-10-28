@@ -1,4 +1,5 @@
-from FoundationData import FoundationData
+from JLFoundationData import FoundationData
+from datetime import datetime
 
 '''
 LiveData is a database representation for a Blog. 
@@ -28,7 +29,7 @@ class LiveData(FoundationData):
 
 			@param ({str : object}): The values to insert
 		'''
-		self.commit(self.insert_zone_statement(), self.get_table_properties(self.ZONE_TABLE), values)
+		self.commit(self.insert_zone_statement(), self.get_table_properties_excluding_ID(self.ZONE_TABLE), values)
 
 	def insert_post(self, values):
 		'''
@@ -36,7 +37,21 @@ class LiveData(FoundationData):
 		
 			@param ({str : object}): The values to insert
 		'''
-		self.commit(self.insert_post_statement(), self.get_table_properties(self.POST_TABLE), values)
+		new_values = {}
+		post_properties = self.get_table_properties_excluding_ID(self.POST_TABLE)
+		# If the properties being provided are different from the ones we expect, we need to do some magic.
+		if post_properties != values.keys():
+			for prop in post_properties:
+				if prop == 'post_time':
+					new_values[prop] = str(datetime.now())
+				elif prop == 'zone_id' and prop not in values.keys():
+					if 'zone_name' in values.keys():
+						zone_id = self.get_zone(values['zone_name'])
+						new_values[prop] = zone_id
+				else:
+					new_values[prop] = values[prop]
+
+		self.commit(self.insert_post_statement(), post_properties, new_values)
 
 	def insert_comment(self, values):
 		'''
@@ -44,7 +59,7 @@ class LiveData(FoundationData):
 		
 			@param ({str : object}): The values to insert
 		'''
-		self.commit(self.insert_comment_statement(), self.get_table_properties(self.COMMENT_TABLE), values)
+		self.commit(self.insert_comment_statement(), self.get_table_properties_excluding_ID(self.COMMENT_TABLE), values)
 
 	def insert_media(self, values):
 		'''
@@ -52,7 +67,7 @@ class LiveData(FoundationData):
 		
 			@param ({str : object}): The values to insert
 		'''
-		self.commit(self.insert_media_statement(), self.get_table_properties(self.MEDIA_TABLE), values)
+		self.commit(self.insert_media_statement(), self.get_table_properties_excluding_ID(self.MEDIA_TABLE), values)
 
 	#####################
 	# Insert Statements #

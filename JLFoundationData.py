@@ -97,7 +97,7 @@ class FoundationData(object):
 			@param table_name (str): the name of the table in which to INSERT
 			@returns (str): The SQL command to insert into the specified table.
 		'''
-		properties = self.get_table_properties(table_name)
+		properties = self.get_table_properties_excluding_ID(table_name)
 		insert = 'INSERT into ' + table_name + '('
 		property_index = 0
 		values_string = 'values('
@@ -128,6 +128,9 @@ class FoundationData(object):
 		select = 'SELECT * from ' + str(table_name)
 		cursor = self.__execute(select)
 		return [description[0] for description in cursor.description][0:]
+
+	def get_table_properties_excluding_ID(self, table_name):
+		return self.get_table_properties(table_name)[1:]
 
 	def get_rows(self, table_name, condition=None):
 		'''
