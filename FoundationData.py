@@ -7,9 +7,9 @@ PROPERTIES_KEY = "properties"
 TABLE_NAME_KEY = "table_name"
 FOREIGN_KEY_INFO_KEY = "keys"
 
-DEBUG_MODE = False
+DEBUG_MODE = True
 def print_debug(s):
-	if (DEBUG_MODE): print create_table_command
+	if (DEBUG_MODE): print s
 
 class FoundationData(object):
 	#############
@@ -64,7 +64,7 @@ class FoundationData(object):
 	#################
 	# SQL Statements #
 	#################
-		@staticmethod
+	@staticmethod
 	def create_table_command(table_name, property_qualifier_pairs, foreign_key_info, should_have_primary_key_id=True):
 		'''
 			Static method that retuns a statement to create a new table in the database
@@ -91,8 +91,7 @@ class FoundationData(object):
 	##########
 	# Insert #
 	##########
-		@staticmethod
-	def insert_statement(table_name):
+	def insert_statement(self, table_name):
 		'''
 			Static method that returns a statement to insert values into a table.
 			@param table_name (str): the name of the table in which to INSERT
@@ -128,7 +127,7 @@ class FoundationData(object):
 		'''
 		select = 'SELECT * from ' + str(table_name)
 		cursor = self.__execute(select)
-		return [description[0] for description in cursor.description][1:]
+		return [description[0] for description in cursor.description][0:]
 
 	def get_rows(self, table_name, condition=None):
 		'''
@@ -152,6 +151,7 @@ class FoundationData(object):
 		'''
 		rows = self.get_rows(table_name, condition)
 		columns = self.get_table_properties(table_name)
+		print_debug(str(columns))
 		return map(lambda row : dict(zip(columns, row)), rows)
 
 	##########
@@ -171,7 +171,7 @@ class FoundationData(object):
 	#################
 	# DB Operations #
 	#################
-	def __commit(self, statement, properties, values):
+	def commit(self, statement, properties, values):
 		'''
 			Actually persists the data to the database TODO#1
 			@param table_name (str): the name of the table
@@ -179,7 +179,7 @@ class FoundationData(object):
 			@param values ({str:any}): a dictonary with properties as the keys and the new value of that property as values
 		'''
 		new_vales = None
-		if values != None && properties != none:
+		if values != None and properties != None:
 			new_values = order_values_for_properties(values, properties)
 		db = sqlite3.connect(self.DB_NAME())
 		cursor = db.cursor()
@@ -204,7 +204,7 @@ class FoundationData(object):
 		return executed
 
 	def __update(self, statement):
-		self.__commit(statement, None, None)
+		self.commit(statement, None, None)
 
 '''END FoundationData '''
 

@@ -2,27 +2,7 @@ from FoundationData import FoundationData
 
 '''
 LiveData is a database representation for a Blog. 
-A Blog is defined as:
-Zone
-	id
-	Posts
-	Name
-
-Post
-	id
-	name
-	title
-	medias?
-	comments?
-
-Image
-	imageDestination
-	post
-
-Comment
-	user_name
-	post_id
-	body
+TestData.json describes the DB schema
 '''
 
 class LiveData(FoundationData):
@@ -48,7 +28,7 @@ class LiveData(FoundationData):
 
 			@param ({str : object}): The values to insert
 		'''
-		self.__commit(self.insert_zone_statement(), self.get_table_properties(self.ZONE_TABLE), values)
+		self.commit(self.insert_zone_statement(), self.get_table_properties(self.ZONE_TABLE), values)
 
 	def insert_post(self, values):
 		'''
@@ -56,7 +36,7 @@ class LiveData(FoundationData):
 		
 			@param ({str : object}): The values to insert
 		'''
-		self.__commit(self.insert_post_statement(), self.get_table_properties(self.POST_TABLE), values)
+		self.commit(self.insert_post_statement(), self.get_table_properties(self.POST_TABLE), values)
 
 	def insert_comment(self, values):
 		'''
@@ -64,7 +44,7 @@ class LiveData(FoundationData):
 		
 			@param ({str : object}): The values to insert
 		'''
-		self.__commit(self.insert_comment_statement(), self.get_table_properties(self.COMMENT_TABLE), values)
+		self.commit(self.insert_comment_statement(), self.get_table_properties(self.COMMENT_TABLE), values)
 
 	def insert_media(self, values):
 		'''
@@ -72,7 +52,7 @@ class LiveData(FoundationData):
 		
 			@param ({str : object}): The values to insert
 		'''
-		self.__commit(self.insert_media_statement(), self.get_table_properties(self.MEDIA_TABLE), values)
+		self.commit(self.insert_media_statement(), self.get_table_properties(self.MEDIA_TABLE), values)
 
 	#####################
 	# Insert Statements #
@@ -81,25 +61,25 @@ class LiveData(FoundationData):
 		'''
 			@returns (str): A SQL INSERT statement suitable for the Zone table.
 		'''
-		return LiveData.insert_statement(self.ZONE_TABLE)
+		return self.insert_statement(self.ZONE_TABLE)
 
 	def insert_post_statement(self):
 		'''
 			@returns (str): A SQL INSERT statement suitable for the Post table.
 		'''
-		return LiveData.insert_statement(self.POST_TABLE)
+		return self.insert_statement(self.POST_TABLE)
 
 	def insert_comment_statement(self):
 		'''
 			@returns (str): A SQL INSERT statement suitable for the Comment table.
 		'''
-		return LiveData.insert_statement(self.COMMENT_TABLE)
+		return self.insert_statement(self.COMMENT_TABLE)
 
 	def insert_media_statement(self):
 		'''
 			@returns (str): A SQL INSERT statement suitable for the Media table.
 		'''
-		return LiveData.insert_statement(self.media_TABLE)
+		return self.insert_statement(self.media_TABLE)
 
 	############
 	# Get Data #
@@ -111,13 +91,21 @@ class LiveData(FoundationData):
 		'''
 		return self.select_all(self.ZONE_TABLE)
 
+	def get_zone(self, zone_name):
+		'''
+			@param zone_name (str) : The name of a zone
+			@returns ([object]) : The zones with name zone_name
+		'''
+		condition = 'zone_name=\'' + str(zone_name) + '\''
+		zones = self.select_all(self.ZONE_TABLE, condition)
+		return zones
+
 	def get_id_for_zone(self, zone_name):
 		'''
 			@param zone_name (str) : The name of a zone
 			@returns (int): The ID that corresponds with the zone named 'zone_name' if it exists
 		'''
-		condition = 'zone_name=\'' + str(zone_name) + '\''
-		zones = self.select_all(self.ZONE_TABLE, condition)
+		zones = self.get_zone(zone_name)
 		if len(zones) > 0:
 			return zones[0][self.UNIQUE_ID_PROPERTY]
 		else:
